@@ -2,7 +2,7 @@
 
 ## What is this
 This AOC_2023 repo is built whilst I am looking for a job and will contain what I hope to be solutions for the Advent of Code 2023 event (hosted here: https://adventofcode.com/2023) 
-I am doing these as of now in Rust-Lang in order to learn the language as well as prepare myself for employment.
+I am doing these as of now in Rust-Lang in order to learn the language as well as prepare myself for employment. I recognize that rust is probably not the best to use for these but as I said it is for practice.
 
 ### Days
 1. Day 1 - Trebuchet (Complete -  2 Stars)
