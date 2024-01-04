@@ -1,5 +1,6 @@
 use std::fs;
 use std::error::Error;
+use std::os::raw;
 
 pub fn read_doc(filename: &str) -> Result<String, Box<dyn Error>>{
     
@@ -105,4 +106,33 @@ fn get_numbers(line : &str, y: i32) -> Result<Vec<Number>, Box<dyn Error>> {
         });
     }
     Ok(numbers)
+}
+
+
+pub fn part_two(raw_input : String) -> Result<i32,Box<dyn Error>> {
+    let mut symbols: Vec<Symbol> = vec![];
+    let mut numbers: Vec<Number> = vec![];
+
+    for (line_num, line) in raw_input.lines().enumerate() {
+        numbers.append(&mut get_numbers(line, line_num as i32).unwrap());
+
+        for (x, c) in line.chars().enumerate() {
+            if c == '*' {
+                symbols.push(Symbol::new(x as i32, line_num as i32));
+            }
+        }
+    }
+
+    
+    Ok(symbols.iter()
+    .map(|x| {
+        let collisions = numbers.iter()
+        .filter_map(|number| if number.is_touching(x) {Some(number.number)}else {None});
+        if collisions.clone().count() == 2 {
+            return collisions.product();
+        }
+
+        0
+    })
+    .sum::<i32>())
 }
