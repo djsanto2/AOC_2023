@@ -24,6 +24,7 @@ pub fn part_one(input : &str) -> Result<i32, Box<dyn Error>> {
     for (_card_number, line) in input.lines().enumerate() {
         let mut begin = false;
         let mut got_playing = false;
+        let mut score :i32 = 0;
         for c in line.chars(){
             if begin {
                 if c.is_numeric() {
@@ -31,11 +32,11 @@ pub fn part_one(input : &str) -> Result<i32, Box<dyn Error>> {
                 }
                 else if c.is_whitespace() {
                     if !got_playing && !current_number.is_empty() {
-                        current_winning_numbers.push(current_number.parse::<i32>().unwrap());
+                        current_play_numbers.push(current_number.parse::<i32>().unwrap());
                         current_number.clear();
                     }
                     else if got_playing && !current_number.is_empty(){
-                        current_play_numbers.push(current_number.parse::<i32>().unwrap());
+                        current_winning_numbers.push(current_number.parse::<i32>().unwrap());
                         current_number.clear();
                     }
                 }
@@ -48,7 +49,16 @@ pub fn part_one(input : &str) -> Result<i32, Box<dyn Error>> {
             }
         }
         //todo: Sum count of winners in play numbers
-        scores.push(current_play_numbers.iter().filter(|x| current_winning_numbers.contains(x)).count() as i32);
+        for play_num in current_play_numbers.clone() {
+            if current_winning_numbers.contains(&play_num) {
+                if score == 0 { score = 1}
+                else { score *=2}
+            }
+        }   
+        scores.push(score);
+        current_play_numbers.clear();
+        current_winning_numbers.clear();
+
     }
     Ok(scores.iter().sum())
 }
