@@ -1,13 +1,15 @@
 use std::fs;
 use std::error::Error;
 
-struct almanac_map {
+struct AlmanacMap {
     beginnings: Vec<String>,
     destinations: Vec<String>,
     ranges: Vec<String>,
 }
 
-impl almanac_map {
+
+impl AlmanacMap {
+    #[allow(unused)]
     pub fn new() -> Self {
         Self {
             beginnings: Vec::new(),
@@ -28,7 +30,7 @@ impl almanac_map {
                 id_num = id.parse::<i64>().unwrap();
                 range_number = self.ranges[begin_idx].parse::<i64>().unwrap();
                 if id_num >= number 
-                &&  id_num <= (number + range_number-1){
+                &&  id_num <= (number + range_number){
                     output_ids.push((self.destinations[begin_idx].parse::<i64>().unwrap() + (id_num-number)).to_string());
                     id_found = true;
                 }
@@ -47,8 +49,8 @@ impl almanac_map {
         self.ranges.push(numbers[2].to_string())
     }
 
-    pub fn clone(&self) -> almanac_map {
-        let mut out_map = almanac_map::new();
+    pub fn clone(&self) -> AlmanacMap {
+        let mut out_map = AlmanacMap::new();
         out_map.beginnings = self.beginnings.to_vec();
         out_map.destinations = self.destinations.to_vec();
         out_map.ranges = self.ranges.to_vec();
@@ -74,15 +76,16 @@ pub fn part_one(input: &str) -> Result<Vec<String>, Box<dyn Error>>{
     let mut beginnings: Vec<String> = vec![];
     let mut ranges: Vec<String> = vec![];
     let mut transitions:Vec<String> = vec![];
-    let mut almanac_maps :Vec<almanac_map> = vec![];
+    let mut almanac_maps :Vec<AlmanacMap> = vec![];
     let mut seeds_used = false;
-    for (idx,line) in input.lines().enumerate() {
-        
+
+
+    for (_idx,line) in input.lines().enumerate() {
         //check if new map
         if line.contains(':') {
             //follow map
             if !destinations.is_empty() && !ranges.is_empty() && !beginnings.is_empty() {
-                almanac_maps.push(almanac_map{
+                almanac_maps.push(AlmanacMap{
                     beginnings: beginnings.clone(),
                     destinations: destinations.clone(),
                     ranges: ranges.clone(),
@@ -106,6 +109,21 @@ pub fn part_one(input: &str) -> Result<Vec<String>, Box<dyn Error>>{
             beginnings.push(numbers[1].to_string());
             ranges.push(numbers[2].to_string());
         }
+    }//endfor
+    if !destinations.is_empty() && !ranges.is_empty() && !beginnings.is_empty() {
+        almanac_maps.push(AlmanacMap{
+            beginnings: beginnings.clone(),
+            destinations: destinations.clone(),
+            ranges: ranges.clone(),
+        });
+        
+        
+        transitions = almanac_maps.last().unwrap().get_destinations(transitions.clone()).unwrap();
+        
+        //may as well clear these
+        destinations.clear();
+        beginnings.clear();
+        ranges.clear();
     }
     
     Ok(transitions)
