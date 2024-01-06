@@ -16,49 +16,39 @@ pub fn read_doc(filename: &str) -> Result<String, Box<dyn Error>>{
 }
 
 pub fn part_one(input : &str) -> Result<i32, Box<dyn Error>> {
-    let mut current_winning_numbers: Vec<i32> = vec![];
-    let mut current_play_numbers : Vec<i32> = vec![];
-    let mut current_number = "".to_string();
+    let mut split_id: Option<usize> =None;
+    let mut scores = vec![0;input.lines().count()];
+    for (idx, line) in input.lines().enumerate() {
+        let mut card : Vec<&str>= line.split_once(':').unwrap().1.split_whitespace().collect();
 
-    let mut scores: Vec<i32> = vec![];
-    for (_card_number, line) in input.lines().enumerate() {
-        let mut begin = false;
-        let mut got_playing = false;
-        let mut score :i32 = 0;
-        for c in line.chars(){
-            if begin {
-                if c.is_numeric() {
-                    current_number.push(c);
-                }
-                else if c.is_whitespace() {
-                    if !got_playing && !current_number.is_empty() {
-                        current_play_numbers.push(current_number.parse::<i32>().unwrap());
-                        current_number.clear();
-                    }
-                    else if got_playing && !current_number.is_empty(){
-                        current_winning_numbers.push(current_number.parse::<i32>().unwrap());
-                        current_number.clear();
-                    }
-                }
-                else if c == '|' {
-                    got_playing = true;
-                }
-            }
-            else if c == ':' {
-                begin = true;
-            }
-        }
-        //todo: Sum count of winners in play numbers
-        for play_num in current_play_numbers.clone() {
-            if current_winning_numbers.contains(&play_num) {
-                if score == 0 { score = 1}
-                else { score *=2}
-            }
-        }   
-        scores.push(score);
-        current_play_numbers.clear();
-        current_winning_numbers.clear();
+        if split_id.is_none() {split_id = card.iter().position(|&x| x == "|"); }
 
+        card.remove(split_id.unwrap()); //removes the middle delimiter
+        let mut winning_numbers : Vec<_> = card.iter().map(|x| x.parse::<usize>().unwrap()).collect();
+        let play_numbers = winning_numbers.split_off(split_id.unwrap());
+
+        let score = play_numbers.iter().map(|x| winning_numbers.contains(x) as usize).sum::<usize>();
+        scores[idx] = if score == 0 {0} else {2_usize.pow((score-1) as u32)};
     }
-    Ok(scores.iter().sum())
+    Ok(scores.iter().sum::<usize>() as i32)
+}
+
+
+pub fn part_two(input : &str) -> Result<i32, Box<dyn Error>> {
+    let mut split_id: Option<usize> =None;
+    let mut multiplier = vec![1;input.lines().count()];
+    for (idx, line) in input.lines().enumerate() {
+        let mut card : Vec<&str>= line.split_once(':').unwrap().1.split_whitespace().collect();
+
+        if split_id.is_none() {split_id = card.iter().position(|&x| x == "|"); }
+
+        card.remove(split_id.unwrap()); //removes the middle delimiter
+        let mut winning_numbers : Vec<_> = card.iter().map(|x| x.parse::<usize>().unwrap()).collect();
+        let play_numbers = winning_numbers.split_off(split_id.unwrap());
+        let score = play_numbers.iter().map(|x| winning_numbers.contains(x) as usize).sum::<usize>();
+        for game in idx+1..idx+1+score {
+            multiplier[game] += multiplier[idx];
+        }
+    }
+    Ok(multiplier.iter().sum::<usize>() as i32)
 }
